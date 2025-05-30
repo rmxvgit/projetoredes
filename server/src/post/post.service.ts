@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '.prisma/client';
 import { CreatePostDto } from './dtos';
 
 @Injectable()
@@ -16,6 +16,25 @@ export class PostService {
       throw new Error('Post not found');
     }
     return res;
+  }
+
+  findRecentPosts() {
+    return this.prisma.post.findMany({
+      take: 20,
+      select: {
+        id: true,
+        title: true,
+        createdAt: true,
+        body: true,
+        user: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
   }
 
   async createPost(data: CreatePostDto) {

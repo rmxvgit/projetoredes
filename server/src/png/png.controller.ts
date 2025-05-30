@@ -10,6 +10,11 @@ export class PngController {
     return this.pngService.findAllUserPngs(+id);
   }
 
+  @Get('recent')
+  findRecentUserPngs() {
+    return this.pngService.findRecentPngs();
+  }
+
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return await this.pngService.findOne(+id);

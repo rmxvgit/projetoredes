@@ -11,6 +11,11 @@ export class PostController {
     return this.postService.findAllUserPosts(+id);
   }
 
+  @Get('recent')
+  findRecentPosts() {
+    return this.postService.findRecentPosts();
+  }
+
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return await this.postService.findOne(+id);

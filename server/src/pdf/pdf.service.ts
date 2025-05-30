@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '.prisma/client';
 
 @Injectable()
 export class PdfService {
@@ -7,6 +7,25 @@ export class PdfService {
 
   findAllUserPngs(user_id: number) {
     return this.prisma.post.findMany({ where: { id: user_id } });
+  }
+
+  findRecentPngs() {
+    return this.prisma.pdf.findMany({
+      take: 20,
+      select: {
+        id: true,
+        title: true,
+        createdAt: true,
+        file_name: true,
+        user: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
   }
 
   async findOne(id: number) {

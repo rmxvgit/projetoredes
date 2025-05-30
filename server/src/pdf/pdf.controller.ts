@@ -11,6 +11,11 @@ export class PdfController {
     return this.pngService.findAllUserPngs(+id);
   }
 
+  @Get('recent')
+  findRecentPdfs() {
+    return this.pngService.findRecentPngs();
+  }
+
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return await this.pngService.findOne(+id);
