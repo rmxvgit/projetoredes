@@ -6,7 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../node_modules/@prisma"
+  output   = "../node_modules/.prisma/client"
 }
 
 datasource db {
@@ -15,35 +15,37 @@ datasource db {
 }
 
 model User {
-  id Int @id @default(autoincrement())
-  name String
+  id       Int    @id @default(autoincrement())
+  name     String
   password String
-  bio String
-  image String
-  job String
-  posts Post[]
-  pdfs Pdf[]
-  pngs Png[]
+  bio      String
+  image    String
+  job      String
+  posts    Post[]
+  pdfs     Pdf[]
+  pngs     Png[]
 }
 
 model Post {
-  id Int @id @default(autoincrement())
-  user User @relation(fields: [user_id], references: [id])
+  id      Int    @id @default(autoincrement())
+  user    User   @relation(fields: [user_id], references: [id])
   user_id Int
-  title String
-  body String
+  title   String
+  body    String
 }
 
 model Pdf {
-  id Int @id @default(autoincrement())
-  user User @relation(fields: [user_id], references: [id])
-  user_id Int
+  id        Int    @id @default(autoincrement())
+  user      User   @relation(fields: [user_id], references: [id])
+  user_id   Int
+  title     String
   file_name String
 }
 
 model Png {
-  id Int @id @default(autoincrement())
-  user User @relation(fields: [user_id], references: [id])
-  user_id Int
+  id        Int    @id @default(autoincrement())
+  user      User   @relation(fields: [user_id], references: [id])
+  user_id   Int
+  title     String
   file_name String
 }
