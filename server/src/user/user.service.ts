@@ -16,19 +16,22 @@ export class UserService {
     });
   }
 
-  async getUserProfile(id: number) {
-    return this.prisma.user.findUnique({
+  async getUserProfile(id: number, is_owner: boolean) {
+    const user_profile_data = await this.prisma.user.findUnique({
       where: { id },
       select: {
         id: true,
         name: true,
+        bio: true,
         image: true,
         job: true,
-        pngs: true,
-        pdfs: true,
-        posts: true,
+        pngs: { include: { user: { select: { id: true, name: true } } } },
+        pdfs: { include: { user: { select: { id: true, name: true } } } },
+        posts: { include: { user: { select: { id: true, name: true } } } },
       },
     });
+
+    return { owner: is_owner, ...user_profile_data };
   }
 
   async create(data: CreateUserDto) {

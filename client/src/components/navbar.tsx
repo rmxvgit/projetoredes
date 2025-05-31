@@ -9,7 +9,7 @@ export default function Navbar(): JSX.Element {
     <header>
       <div className="bg-blue-400 flex justify-end p-4 gap-10">
         <h1 className="text-2xl self-center text-white">NOME DO SITE</h1>
-        <button onClick={() => router.push("/profile")}>
+        <button onClick={() => router.push("/profile/me")}>
           <Image
             src="/profile.svg"
             alt="Logo"

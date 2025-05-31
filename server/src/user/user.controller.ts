@@ -24,9 +24,9 @@ export class UserController {
       console.log(typeof request);
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
       const user: AuthTokenDto = request.user;
-      return this.userService.getUserProfile(user.id);
+      return this.userService.getUserProfile(user.id, true);
     }
-    return this.userService.getUserProfile(parseInt(id, 10));
+    return this.userService.getUserProfile(parseInt(id, 10), false);
   }
 
   @Get(':id')
