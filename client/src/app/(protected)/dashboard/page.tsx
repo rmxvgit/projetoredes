@@ -1,9 +1,12 @@
 "use client";
+import { CardProfessor, CardStudent, Post } from "@/lib/interfaces";
+import { makePostCard } from "@/components/postcard";
+
 import { getPosts, getUsers } from "@/lib/requisition";
 import { AxiosError } from "axios";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { JSX, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -18,9 +21,9 @@ export default function DashboardPage() {
       return;
     }
 
-    setProfCards(placeholderProfessors);
+    setProfCards([]);
 
-    setStudentCards(placeholderStudents);
+    setStudentCards([]);
 
     const response = Promise.all([getPosts(), getUsers()]);
     setLoading(true);
@@ -85,91 +88,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-function makePostCard(data: Post) {
-  let content: JSX.Element = <></>;
-  let doc_type: string = "none";
-
-  if ("png" in data) {
-    content = <div>png content</div>;
-    doc_type = "png";
-  }
-
-  if ("pdf" in data) {
-    content = <div>pdf content</div>;
-    doc_type = "pdf";
-  }
-
-  if ("txt" in data) {
-    content = <div className="p-3 border rounded">{data.body}</div>;
-    doc_type = "txt";
-  }
-
-  return (
-    <div
-      key={`${data.id}${doc_type}`}
-      className="bg-white rounded-lg shadow-md p-4 border"
-    >
-      <div className="flex justify-between">
-        <h4 className="font-bold text-sm">{data.author_name} postou:</h4>
-        <p className="bg-blue-400 px-2 rounded-full">{doc_type}</p>
-      </div>
-      <p className="p text-lg font-bold mb-3">{data.title}</p>
-      {content}
-    </div>
-  );
-}
-
-interface CardProfessor {
-  id: number;
-  name: string;
-}
-
-interface CardStudent {
-  id: number;
-  name: string;
-}
-
-export interface CardTxtPost {
-  txt: undefined;
-  id: number;
-  author_name: string;
-  author_id: number;
-  title: string;
-  body: string;
-}
-
-export interface CardPdfPost {
-  pdf: undefined;
-  id: number;
-  author_name: string;
-  author_id: number;
-  file_name: string;
-  title: string;
-}
-
-export interface CardPngPost {
-  png: undefined;
-  id: number;
-  author_name: string;
-  author_id: number;
-  file_name: string;
-  title: string;
-}
-
-export type Post = CardTxtPost | CardPdfPost | CardPngPost;
-
-const placeholderStudents: CardStudent[] = [
-  { id: 1, name: "John Doe" },
-  { id: 2, name: "Jane Smith" },
-  { id: 3, name: "Alice Johnson" },
-];
-
-const placeholderProfessors: CardProfessor[] = [
-  { id: 1, name: "John Doe" },
-  { id: 2, name: "Jane Smith" },
-  { id: 4, name: "Alice Johnson" },
-  { id: 5, name: "Alice Johnson" },
-  { id: 6, name: "Alice Johnson" },
-  { id: 7, name: "Alice Johnson" },
-];

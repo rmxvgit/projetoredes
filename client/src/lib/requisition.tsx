@@ -1,12 +1,8 @@
 "use client";
 const backendUrl = "http://localhost:3001";
 import axios from "axios";
-import {
-  CardPdfPost,
-  CardTxtPost,
-  CardPngPost,
-  Post,
-} from "@/app/(protected)/dashboard/page";
+import { CardPdfPost, CardPngPost, CardTxtPost, Post } from "./interfaces";
+import { UserProfileData } from "@/lib/interfaces";
 
 export async function login(values: { name: string; password: string }) {
   const response = await axios.post(`${backendUrl}/auth/login`, values);
@@ -77,7 +73,20 @@ export async function getUserProfile(user_id: string) {
   if (result.status === 200) {
     const user: ServerUserProfile = result.data;
 
-    return user;
+    const client_data: UserProfileData = {
+      owner: user.owner,
+      name: user.name,
+      bio: user.bio,
+      image: user.image,
+      job: user.job,
+      posts: [
+        ...user.posts.map(servToCardTxtPost),
+        ...user.pdfs.map(servToCardPdfPost),
+        ...user.pngs.map(servToCardPngPost),
+      ],
+    };
+
+    return client_data;
   }
 
   throw new Error("Failed to fetch user");
@@ -87,7 +96,11 @@ interface ServerUserProfile {
   owner: boolean;
   name: string;
   image: string;
+  bio: string;
   job: string;
+  pngs: ServerPngPost[];
+  pdfs: ServerPdfPost[];
+  posts: ServerTxtPost[];
 }
 
 interface ServerUser {
