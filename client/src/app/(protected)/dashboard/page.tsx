@@ -1,4 +1,7 @@
 "use client";
+import { getPosts, getUsers } from "@/lib/requisition";
+import { AxiosError } from "axios";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { JSX, useEffect, useState } from "react";
 
@@ -7,6 +10,7 @@ export default function DashboardPage() {
   const [profCards, setProfCards] = useState<CardProfessor[]>([]);
   const [studentCards, setStudentCards] = useState<CardStudent[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!localStorage.getItem("token")) {
@@ -18,8 +22,30 @@ export default function DashboardPage() {
 
     setStudentCards(placeholderStudents);
 
-    setPosts(placeholderPosts);
-  }, [setProfCards, setStudentCards, setPosts, router]);
+    const response = Promise.all([getPosts(), getUsers()]);
+    setLoading(true);
+
+    response.then((data) => {
+      setPosts(data[0]);
+      setProfCards(
+        data[1].filter((professor) => professor.job === "professor"),
+      );
+      setStudentCards(data[1].filter((student) => student.job === "student"));
+      setLoading(false);
+    });
+
+    response.catch((error: AxiosError) => {
+      if (error instanceof AxiosError) {
+        router.push("/login");
+        localStorage.removeItem("token");
+        return;
+      }
+    });
+  }, [setProfCards, setStudentCards, setPosts, router, setLoading]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="flex flex-col p-14">
@@ -27,12 +53,13 @@ export default function DashboardPage() {
       <h2 className="p-3 text-3xl font-bold">Professores</h2>
       <div className="p-3 grid grid-cols-5 gap-3 mb-8">
         {profCards.map((prof) => (
-          <div
+          <Link
             key={prof.id}
+            href={`/profile/${encodeURIComponent(prof.id)}`}
             className="bg-white rounded-lg shadow-md p-4 border"
           >
             <h3 className="text-lg font-bold">{prof.name}</h3>
-          </div>
+          </Link>
         ))}
       </div>
 
@@ -40,12 +67,13 @@ export default function DashboardPage() {
       <h2 className="p-3 text-3xl font-bold">Alunos</h2>
       <div className="p-3 grid grid-cols-5 gap-3 mb-8">
         {studentCards.map((prof) => (
-          <div
+          <Link
             key={prof.id}
+            href={`/profile/${encodeURIComponent(prof.id)}`}
             className="bg-white rounded-lg shadow-md p-4 border"
           >
             <h3 className="text-lg font-bold">{prof.name}</h3>
-          </div>
+          </Link>
         ))}
       </div>
 
@@ -78,7 +106,10 @@ function makePostCard(data: Post) {
   }
 
   return (
-    <div key={data.id} className="bg-white rounded-lg shadow-md p-4 border">
+    <div
+      key={`${data.id}${doc_type}`}
+      className="bg-white rounded-lg shadow-md p-4 border"
+    >
       <div className="flex justify-between">
         <h4 className="font-bold text-sm">{data.author_name} postou:</h4>
         <p className="bg-blue-400 px-2 rounded-full">{doc_type}</p>
@@ -90,75 +121,55 @@ function makePostCard(data: Post) {
 }
 
 interface CardProfessor {
-  id: string;
+  id: number;
   name: string;
 }
 
 interface CardStudent {
-  id: string;
+  id: number;
   name: string;
 }
 
 export interface CardTxtPost {
   txt: undefined;
-  id: string;
+  id: number;
   author_name: string;
-  file_name: string;
+  author_id: number;
   title: string;
   body: string;
 }
 
 export interface CardPdfPost {
   pdf: undefined;
-  id: string;
+  id: number;
   author_name: string;
+  author_id: number;
   file_name: string;
   title: string;
 }
 
 export interface CardPngPost {
   png: undefined;
-  id: string;
+  id: number;
   author_name: string;
+  author_id: number;
   file_name: string;
   title: string;
 }
 
 export type Post = CardTxtPost | CardPdfPost | CardPngPost;
 
-const placeholderStudents = [
-  { id: "1", name: "John Doe" },
-  { id: "2", name: "Jane Smith" },
-  { id: "3", name: "Alice Johnson" },
+const placeholderStudents: CardStudent[] = [
+  { id: 1, name: "John Doe" },
+  { id: 2, name: "Jane Smith" },
+  { id: 3, name: "Alice Johnson" },
 ];
 
-const placeholderProfessors = [
-  { id: "1", name: "John Doe" },
-  { id: "2", name: "Jane Smith" },
-  { id: "3", name: "Alice Johnson" },
-];
-
-const placeholderPosts: Post[] = [
-  {
-    id: "1",
-    author_name: "John Doe",
-    file_name: "file1.pdf",
-    title: "Title 1",
-    pdf: undefined,
-  },
-  {
-    id: "2",
-    author_name: "Jane Smith",
-    file_name: "file2.png",
-    title: "Title 2",
-    png: undefined,
-  },
-  {
-    id: "3",
-    author_name: "Alice Johnson",
-    file_name: "file3.txt",
-    title: "Title 3",
-    body: "É da minha opinião que eu gosto de batata",
-    txt: undefined,
-  },
+const placeholderProfessors: CardProfessor[] = [
+  { id: 1, name: "John Doe" },
+  { id: 2, name: "Jane Smith" },
+  { id: 4, name: "Alice Johnson" },
+  { id: 5, name: "Alice Johnson" },
+  { id: 6, name: "Alice Johnson" },
+  { id: 7, name: "Alice Johnson" },
 ];

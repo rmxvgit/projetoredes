@@ -3,7 +3,7 @@ export interface LoginDto {
   password: string;
 }
 
-export class AuthTokenDto {
+export interface AuthTokenDto {
   name: string;
   id: number;
   iat: number;

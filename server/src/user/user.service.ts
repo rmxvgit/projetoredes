@@ -11,7 +11,24 @@ export class UserService {
   }
 
   async findAll() {
-    return this.prisma.user.findMany();
+    return this.prisma.user.findMany({
+      select: { id: true, name: true, password: false, image: true, job: true },
+    });
+  }
+
+  async getUserProfile(id: number) {
+    return this.prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        image: true,
+        job: true,
+        pngs: true,
+        pdfs: true,
+        posts: true,
+      },
+    });
   }
 
   async create(data: CreateUserDto) {

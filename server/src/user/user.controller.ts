@@ -1,10 +1,33 @@
-import { Controller, Get, Post, Body, Param, Patch } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Patch,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto, UpdateUserDto } from './dtos';
+import { AuthGuard } from 'src/auth/guards/guards';
+import { AuthTokenDto } from 'src/auth/dto/auth.dto';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @Get('profile:id')
+  @UseGuards(AuthGuard)
+  getUserProfile(@Param('id') id: string, @Req() request: any) {
+    if (id === 'me') {
+      console.log(typeof request);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+      const user: AuthTokenDto = request.user;
+      return this.userService.getUserProfile(user.id);
+    }
+    return this.userService.getUserProfile(parseInt(id, 10));
+  }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
@@ -12,6 +35,7 @@ export class UserController {
   }
 
   @Get()
+  @UseGuards(AuthGuard)
   findAll() {
     return this.userService.findAll();
   }

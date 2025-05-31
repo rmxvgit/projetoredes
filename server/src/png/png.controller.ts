@@ -1,5 +1,6 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { PngService } from './png.service';
+import { AuthGuard } from 'src/auth/guards/guards';
 
 @Controller('png')
 export class PngController {
@@ -11,6 +12,7 @@ export class PngController {
   }
 
   @Get('recent')
+  @UseGuards(AuthGuard)
   findRecentUserPngs() {
     return this.pngService.findRecentPngs();
   }

@@ -1,6 +1,7 @@
-import { Controller, Param, Get, Post, Body } from '@nestjs/common';
+import { Controller, Param, Get, Post, Body, UseGuards } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dtos';
+import { AuthGuard } from 'src/auth/guards/guards';
 
 @Controller('post')
 export class PostController {
@@ -12,6 +13,7 @@ export class PostController {
   }
 
   @Get('recent')
+  @UseGuards(AuthGuard)
   findRecentPosts() {
     return this.postService.findRecentPosts();
   }
