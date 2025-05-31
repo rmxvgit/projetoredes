@@ -1,0 +1,90 @@
+"use client";
+import { CardProfessor, CardStudent, Post } from "@/lib/interfaces";
+import { makePostCard } from "@/components/postcard";
+
+import { getPosts, getUsers } from "@/lib/requisition";
+import { AxiosError } from "axios";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+
+export default function DashboardPage() {
+  const router = useRouter();
+  const [profCards, setProfCards] = useState<CardProfessor[]>([]);
+  const [studentCards, setStudentCards] = useState<CardStudent[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!localStorage.getItem("token")) {
+      router.push("/login");
+      return;
+    }
+
+    setProfCards([]);
+
+    setStudentCards([]);
+
+    const response = Promise.all([getPosts(), getUsers()]);
+    setLoading(true);
+
+    response.then((data) => {
+      setPosts(data[0]);
+      setProfCards(
+        data[1].filter((professor) => professor.job === "professor"),
+      );
+      setStudentCards(data[1].filter((student) => student.job === "student"));
+      setLoading(false);
+    });
+
+    response.catch((error: AxiosError) => {
+      if (error instanceof AxiosError) {
+        router.push("/login");
+        localStorage.removeItem("token");
+        return;
+      }
+    });
+  }, [setProfCards, setStudentCards, setPosts, router, setLoading]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  return (
+    <div className="flex flex-col p-14">
+      {/* seção de professores */}
+      <h2 className="p-3 text-3xl font-bold">Professores</h2>
+      <div className="p-3 grid grid-cols-5 gap-3 mb-8">
+        {profCards.map((prof) => (
+          <Link
+            key={prof.id}
+            href={`/profile/${encodeURIComponent(prof.id)}`}
+            className="bg-white rounded-lg shadow-md p-4 border"
+          >
+            <h3 className="text-lg font-bold">{prof.name}</h3>
+          </Link>
+        ))}
+      </div>
+
+      {/* seção de alunos */}
+      <h2 className="p-3 text-3xl font-bold">Alunos</h2>
+      <div className="p-3 grid grid-cols-5 gap-3 mb-8">
+        {studentCards.map((prof) => (
+          <Link
+            key={prof.id}
+            href={`/profile/${encodeURIComponent(prof.id)}`}
+            className="bg-white rounded-lg shadow-md p-4 border"
+          >
+            <h3 className="text-lg font-bold">{prof.name}</h3>
+          </Link>
+        ))}
+      </div>
+
+      {/* postagens recentes */}
+      <h2 className="p-5 text-2xl font-bold">Últimas postagens</h2>
+      <div className="p-3 flex flex-col gap-3 mb-8">
+        {posts.map(makePostCard)}
+      </div>
+    </div>
+  );
+}
