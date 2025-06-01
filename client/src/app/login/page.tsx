@@ -71,7 +71,12 @@ export default function LoginPage() {
           >
             Login
           </button>
-          <button className="text-sm text-blue-500 hover:text-blue-700">
+
+          <button
+            type="button"
+            onClick={() => router.push("/register")}
+            className="text-sm text-blue-500 hover:text-blue-700"
+          >
             cadastre-se
           </button>
         </Form>
