@@ -13,6 +13,9 @@ export class PdfController {
     return this.pngService.findAllUserPngs(+id);
   }
 
+  @Get('recentcontent')
+  findRecentPdfImages() {}
+
   @Get('recent')
   @UseGuards(AuthGuard)
   findRecentPdfs() {

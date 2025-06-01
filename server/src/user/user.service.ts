@@ -1,14 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
-import { CreateUserDto, UpdateUserDto } from './dtos';
+import { UpdateUserDto } from './dtos';
+import { FileStorage } from 'src/lib/storage';
+import { buffer } from 'rxjs';
 
 @Injectable()
 export class UserService {
   prisma = new PrismaClient();
-
-  async findOne(id: number) {
-    return this.prisma.user.findUnique({ where: { id } });
-  }
 
   async findAll() {
     return this.prisma.user.findMany({
@@ -34,19 +32,28 @@ export class UserService {
     return { owner: is_owner, ...user_profile_data };
   }
 
-  async create(data: CreateUserDto) {
-    return this.prisma.user.create({ data: data });
+  async create(data: {
+    name: string;
+    job: string;
+    password: string;
+    bio: string;
+    image: string;
+    buffer: Buffer<ArrayBufferLike>;
+    type: string;
+  }) {
+    FileStorage.storeImage(data.image, data.buffer);
+    return this.prisma.user.create({
+      data: {
+        name: data.name,
+        job: data.job,
+        password: data.password,
+        image: data.image,
+        bio: data.bio,
+      },
+    });
   }
 
   async update(id: number, data: UpdateUserDto) {
     return this.prisma.user.update({ where: { id }, data: data });
-  }
-
-  async findAllTeachers() {
-    return this.prisma.user.findMany({ where: { job: 'TEACHER' } });
-  }
-
-  async findAllStudents() {
-    return this.prisma.user.findMany({ where: { job: 'STUDENT' } });
   }
 }

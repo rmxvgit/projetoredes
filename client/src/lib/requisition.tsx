@@ -9,6 +9,31 @@ export async function login(values: { name: string; password: string }) {
   return response;
 }
 
+export async function register(
+  values: {
+    name: string;
+    password: string;
+    bio: string;
+    job: string;
+  },
+  file: File | null,
+) {
+  const form_data = new FormData();
+  if (file) {
+    form_data.append("image", file);
+  }
+  form_data.append("name", values.name);
+  form_data.append("password", values.password);
+  form_data.append("bio", values.bio);
+  form_data.append("job", values.job);
+
+  const response = await axios.post(`${backendUrl}/user`, form_data, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+
+  return response;
+}
+
 export async function getPosts() {
   const token = localStorage.getItem("token");
 

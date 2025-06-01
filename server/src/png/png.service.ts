@@ -3,6 +3,9 @@ import { PrismaClient } from '.prisma/client';
 
 @Injectable()
 export class PngService {
+  findRecendUserPngImages() {
+    throw new Error('Method not implemented.');
+  }
   prisma = new PrismaClient();
 
   findAllUserPngs(user_id: number) {
