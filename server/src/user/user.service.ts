@@ -58,7 +58,11 @@ export class UserService {
       },
     });
 
-    FileStorage.storeImage(`u${new_user.id}.png`, data.buffer);
+    try {
+      FileStorage.storeImage(`u${new_user.id}.png`, data.buffer);
+    } catch {
+      await this.prisma.user.delete({ where: { id: new_user.id } });
+    }
   }
 
   async update(id: number, data: UpdateUserDto) {

@@ -99,6 +99,7 @@ export async function getUserProfile(user_id: string) {
     const user: ServerUserProfile = result.data;
 
     const client_data: UserProfileData = {
+      id: user.id,
       owner: user.owner,
       name: user.name,
       bio: user.bio,
@@ -117,7 +118,14 @@ export async function getUserProfile(user_id: string) {
   throw new Error("Failed to fetch user");
 }
 
+export function getPngUrl(entity_id: number, entity_type: "user" | "post") {
+  const path = `${backendUrl}/png/see${entity_type[0]}${entity_id}.png`;
+  console.log(path);
+  return path;
+}
+
 interface ServerUserProfile {
+  id: number;
   owner: boolean;
   name: string;
   image: string;

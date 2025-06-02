@@ -1,20 +1,23 @@
 "use client";
-import { getUserProfile } from "@/lib/requisition";
+import { getPngUrl, getUserProfile } from "@/lib/requisition";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import { makePostCard } from "@/components/postcard";
 import { UserProfileData } from "@/lib/interfaces";
-import { Formik, Form, Field } from "formik";
+import Image from "next/image";
+import NewPostForm from "./forms";
 
 export default function UserProfilePage() {
   const params = useParams<{ profile: string }>();
   const [loading, setLoading] = useState(true);
+  const [newPostType, setPostType] = useState<"pdf" | "png" | "txt">("txt");
   const router = useRouter();
   const profile_id = params.profile;
 
   const [user, setUser] = useState<UserProfileData>({
+    id: 0,
     owner: true,
     name: "",
     bio: "",
@@ -22,11 +25,6 @@ export default function UserProfilePage() {
     job: "",
     posts: [],
   });
-
-  function postFormSubmit(values: { title: string; body: string }) {
-    console.log("submit button pressed");
-    console.log(values);
-  }
 
   useEffect(() => {
     const response = getUserProfile(profile_id);
@@ -56,7 +54,15 @@ export default function UserProfilePage() {
       <div className="flex p-3 rounded gap-12">
         {/* foto de perfil */}
         <div className="flex gap-10 justify-center">
-          <div className="border rounded-full w-60 aspect-square"></div>
+          <div className="border rounded-full w-60 aspect-square overflow-hidden">
+            <Image
+              src={getPngUrl(user.id, "user")}
+              alt="profile image"
+              width={160}
+              height={160}
+              className="w-full"
+            />
+          </div>
         </div>
 
         {/* nome e cargo */}
@@ -79,7 +85,7 @@ export default function UserProfilePage() {
       {/* bio */}
       <div className="border p-3 rounded-lg flex flex-col gap-5">
         <h2 className="text-2xl font-bold">Sobre mim:</h2>
-        <p className="border">
+        <p className="border rounded-lg p-2">
           {user.bio === "" ? "Não há bio disponível." : user.bio}
         </p>
       </div>
@@ -87,24 +93,31 @@ export default function UserProfilePage() {
       {/* nova postagem */}
       {user.owner ? (
         <div className="rounded-lg border p-3 flex flex-col gap-5">
-          <h2 className="text-2xl font-bold">Nova postagem:</h2>
-          <Formik
-            initialValues={{ title: "", body: "" }}
-            onSubmit={postFormSubmit}
-          >
-            <Form className="flex flex-col gap-3">
-              <Field
-                name="title"
-                placeholder="Título"
-                className="border p-2 rounded"
-              />
-              <Field
-                name="body"
-                placeholder="Conteúdo"
-                className="border p-2 rounded"
-              />
-            </Form>
-          </Formik>
+          <div className="flex justify-between">
+            <h2 className="text-2xl font-bold">Nova postagem:</h2>
+            <div className="flex gap-3">
+              <button
+                className="p-2 rounded-lg border"
+                onClick={() => setPostType("txt")}
+              >
+                Texto
+              </button>
+              <button
+                className="p-2 rounded-lg border"
+                onClick={() => setPostType("pdf")}
+              >
+                Pdf
+              </button>
+              <button
+                className="p-2 rounded-lg border"
+                onClick={() => setPostType("png")}
+              >
+                Png
+              </button>
+            </div>
+          </div>
+
+          {NewPostForm(newPostType)}
         </div>
       ) : null}
 

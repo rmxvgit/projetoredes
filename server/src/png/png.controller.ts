@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Get,
-  HttpException,
-  HttpStatus,
-  Param,
-  Res,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Param, Res, UseGuards } from '@nestjs/common';
 import { PngService } from './png.service';
 import { AuthGuard } from 'src/auth/guards/guards';
 import { join } from 'node:path/posix';
@@ -30,15 +22,15 @@ export class PngController {
   }
 
   @Get('see:name')
-  findRecendUserPngImages(@Param('name') name: string, @Res() res: Response) {
+  seeImage(@Param('name') name: string, @Res() res: Response) {
     console.log(name);
     console.log(process.cwd());
     console.log(FileStorage.PNG_STORAGE_PATH);
 
-    const file_path = join(process.cwd(), FileStorage.PNG_STORAGE_PATH, name);
+    let file_path = join(process.cwd(), FileStorage.PNG_STORAGE_PATH, name);
 
     if (!existsSync(file_path)) {
-      throw new HttpException('File not found', HttpStatus.BAD_REQUEST);
+      file_path = join(process.cwd(), FileStorage.DEFAULT_PROFILE_IMG_PATH);
     }
 
     const stream = createReadStream(file_path);

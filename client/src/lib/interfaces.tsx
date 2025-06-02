@@ -38,6 +38,7 @@ export interface CardPngPost {
 export type Post = CardTxtPost | CardPdfPost | CardPngPost;
 
 export interface UserProfileData {
+  id: number;
   owner: boolean;
   name: string;
   bio: string;
