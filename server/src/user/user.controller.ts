@@ -46,16 +46,20 @@ export class UserController {
   create(
     @Req() request: any,
     @UploadedFile()
-    image: { originalname: string; buffer: Buffer; mimetype: string },
+    image: { originalname: string; buffer: Buffer; mimetype: string } | null,
     @Body() body: { name: string; job: string; password: string; bio: string },
   ) {
+    if (!image) {
+      return this.userService.createNoImage();
+    }
+
     const user_data = {
       name: body.name,
       job: body.job,
       password: body.password,
       bio: body.bio,
 
-      image: '',
+      image: image.originalname,
       buffer: image.buffer,
       type: image.mimetype.split('/')[1],
     };

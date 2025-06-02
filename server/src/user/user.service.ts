@@ -2,10 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { UpdateUserDto } from './dtos';
 import { FileStorage } from 'src/lib/storage';
-import { buffer } from 'rxjs';
 
 @Injectable()
 export class UserService {
+  createNoImage() {
+    throw new Error('Method not implemented.');
+  }
   prisma = new PrismaClient();
 
   async findAll() {
@@ -41,8 +43,12 @@ export class UserService {
     buffer: Buffer<ArrayBufferLike>;
     type: string;
   }) {
-    FileStorage.storeImage(data.image, data.buffer);
-    return this.prisma.user.create({
+    const exists = await this.prisma.user.count({ where: { name: data.name } });
+    if (exists > 0) {
+      return { exists: true };
+    }
+
+    const new_user = await this.prisma.user.create({
       data: {
         name: data.name,
         job: data.job,
@@ -51,6 +57,8 @@ export class UserService {
         bio: data.bio,
       },
     });
+
+    FileStorage.storeImage(`u${new_user.id}.png`, data.buffer);
   }
 
   async update(id: number, data: UpdateUserDto) {
