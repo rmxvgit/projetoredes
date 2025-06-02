@@ -101,7 +101,7 @@ export default function DashboardPage() {
 
       {/* postagens recentes */}
       <h2 className="p-5 text-2xl font-bold">Últimas postagens</h2>
-      <div className="p-3 flex flex-col gap-3 mb-8">
+      <div className="grid gap-3 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 grid-cols">
         {posts.map(makePostCard)}
       </div>
     </div>

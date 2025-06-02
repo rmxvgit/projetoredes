@@ -1,10 +1,24 @@
-import { Controller, Get, Param, Res, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Res,
+  Req,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { PngService } from './png.service';
 import { AuthGuard } from 'src/auth/guards/guards';
 import { join } from 'node:path/posix';
 import { FileStorage } from 'src/lib/storage';
 import { createReadStream, existsSync } from 'node:fs';
 import { Response } from 'express';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ImageFields, NewPngBody } from './dtos';
+import { AuthTokenDto } from 'src/auth/dto/auth.dto';
 
 @Controller('png')
 export class PngController {
@@ -35,6 +49,20 @@ export class PngController {
 
     const stream = createReadStream(file_path);
     stream.pipe(res);
+  }
+
+  @Post('')
+  @UseGuards(AuthGuard)
+  @UseInterceptors(FileInterceptor('image'))
+  newPngPost(
+    @Body() body: NewPngBody,
+    @UploadedFile()
+    image: ImageFields,
+    @Req() request: any,
+  ) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+    const user: AuthTokenDto = request.user;
+    return this.pngService.createPng(body, image, user.id);
   }
 
   @Get(':id')

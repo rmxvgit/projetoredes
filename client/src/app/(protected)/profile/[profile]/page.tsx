@@ -15,6 +15,9 @@ export default function UserProfilePage() {
   const [newPostType, setPostType] = useState<"pdf" | "png" | "txt" | "none">(
     "none",
   );
+  const [errorMsg, setErrMsg] = useState<string>("");
+  const [file, setFile] = useState<File | null>(null);
+
   const router = useRouter();
   const profile_id = params.profile;
 
@@ -128,15 +131,24 @@ export default function UserProfilePage() {
                 </button>
               </div>
             </div>
-            {NewPostForm(newPostType)}
+            {NewPostForm(
+              newPostType,
+              errorMsg,
+              setErrMsg,
+              file,
+              setFile,
+              router,
+            )}
           </div>
         )
       ) : null}
 
       {/* postagens */}
-      <div className="flex flex-col gap-3">
+      <div>
         <h2 className="text-2xl p-3 font-bold">Postagens:</h2>
-        {user.posts.map(makePostCard)}
+        <div className="grid gap-3 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 grid-cols">
+          {user.posts.map(makePostCard)}
+        </div>
       </div>
     </div>
   );

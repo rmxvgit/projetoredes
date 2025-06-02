@@ -118,6 +118,22 @@ export async function getUserProfile(user_id: string) {
   throw new Error("Failed to fetch user");
 }
 
+export async function makePngPost(file: File, title: string) {
+  const token = localStorage.getItem("token");
+  const form_data = new FormData();
+  form_data.append("title", title);
+  form_data.append("image", file);
+
+  const response = await axios.post(`${backendUrl}/png`, form_data, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return response;
+}
+
 export function getPngUrl(entity_id: number, entity_type: "user" | "post") {
   const path = `${backendUrl}/png/see${entity_type[0]}${entity_id}.png`;
   console.log(path);
