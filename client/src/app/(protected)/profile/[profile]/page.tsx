@@ -12,7 +12,9 @@ import NewPostForm from "./forms";
 export default function UserProfilePage() {
   const params = useParams<{ profile: string }>();
   const [loading, setLoading] = useState(true);
-  const [newPostType, setPostType] = useState<"pdf" | "png" | "txt">("txt");
+  const [newPostType, setPostType] = useState<"pdf" | "png" | "txt" | "none">(
+    "none",
+  );
   const router = useRouter();
   const profile_id = params.profile;
 
@@ -92,33 +94,43 @@ export default function UserProfilePage() {
 
       {/* nova postagem */}
       {user.owner ? (
-        <div className="rounded-lg border p-3 flex flex-col gap-5">
-          <div className="flex justify-between">
-            <h2 className="text-2xl font-bold">Nova postagem:</h2>
-            <div className="flex gap-3">
-              <button
-                className="p-2 rounded-lg border"
-                onClick={() => setPostType("txt")}
-              >
-                Texto
-              </button>
-              <button
-                className="p-2 rounded-lg border"
-                onClick={() => setPostType("pdf")}
-              >
-                Pdf
-              </button>
-              <button
-                className="p-2 rounded-lg border"
-                onClick={() => setPostType("png")}
-              >
-                Png
-              </button>
-            </div>
+        newPostType == "none" ? (
+          <div className="flex justify-start">
+            <button
+              className="text-2xl font-bold border rounded-lg p-2"
+              onClick={() => setPostType("txt")}
+            >
+              Fazer postagem
+            </button>
           </div>
-
-          {NewPostForm(newPostType)}
-        </div>
+        ) : (
+          <div className="rounded-lg border p-3 flex flex-col gap-5">
+            <div className="flex justify-between">
+              <h2 className="text-2xl font-bold">Nova postagem:</h2>
+              <div className="flex gap-3">
+                <button
+                  className={`p-2 rounded-lg border ${newPostType == "txt" ? "bg-blue-400" : ""}`}
+                  onClick={() => setPostType("txt")}
+                >
+                  Texto
+                </button>
+                <button
+                  className={`p-2 rounded-lg border ${newPostType == "pdf" ? "bg-blue-400" : ""}`}
+                  onClick={() => setPostType("pdf")}
+                >
+                  Pdf
+                </button>
+                <button
+                  className={`p-2 rounded-lg border ${newPostType == "png" ? "bg-blue-400" : ""}`}
+                  onClick={() => setPostType("png")}
+                >
+                  Png
+                </button>
+              </div>
+            </div>
+            {NewPostForm(newPostType)}
+          </div>
+        )
       ) : null}
 
       {/* postagens */}
