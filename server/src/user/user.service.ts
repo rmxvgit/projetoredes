@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
-import { CreateUserDto, UpdateUserDto } from './dtos';
+import { UpdateUserDto } from './dtos';
+import { FileStorage } from 'src/lib/storage';
 
 @Injectable()
 export class UserService {
-  prisma = new PrismaClient();
-
-  async findOne(id: number) {
-    return this.prisma.user.findUnique({ where: { id } });
+  createNoImage() {
+    throw new Error('Method not implemented.');
   }
+  prisma = new PrismaClient();
 
   async findAll() {
     return this.prisma.user.findMany({
@@ -34,19 +34,38 @@ export class UserService {
     return { owner: is_owner, ...user_profile_data };
   }
 
-  async create(data: CreateUserDto) {
-    return this.prisma.user.create({ data: data });
+  async create(data: {
+    name: string;
+    job: string;
+    password: string;
+    bio: string;
+    image: string;
+    buffer: Buffer<ArrayBufferLike>;
+    type: string;
+  }) {
+    const exists = await this.prisma.user.count({ where: { name: data.name } });
+    if (exists > 0) {
+      return { exists: true };
+    }
+
+    const new_user = await this.prisma.user.create({
+      data: {
+        name: data.name,
+        job: data.job,
+        password: data.password,
+        image: data.image,
+        bio: data.bio,
+      },
+    });
+
+    try {
+      FileStorage.storeImage(`u${new_user.id}.png`, data.buffer);
+    } catch {
+      await this.prisma.user.delete({ where: { id: new_user.id } });
+    }
   }
 
   async update(id: number, data: UpdateUserDto) {
     return this.prisma.user.update({ where: { id }, data: data });
-  }
-
-  async findAllTeachers() {
-    return this.prisma.user.findMany({ where: { job: 'TEACHER' } });
-  }
-
-  async findAllStudents() {
-    return this.prisma.user.findMany({ where: { job: 'STUDENT' } });
   }
 }

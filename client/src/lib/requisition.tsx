@@ -9,6 +9,31 @@ export async function login(values: { name: string; password: string }) {
   return response;
 }
 
+export async function register(
+  values: {
+    name: string;
+    password: string;
+    bio: string;
+    job: string;
+  },
+  file: File | null,
+) {
+  const form_data = new FormData();
+  if (file) {
+    form_data.append("image", file);
+  }
+  form_data.append("name", values.name);
+  form_data.append("password", values.password);
+  form_data.append("bio", values.bio);
+  form_data.append("job", values.job);
+
+  const response = await axios.post(`${backendUrl}/user`, form_data, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+
+  return response;
+}
+
 export async function getPosts() {
   const token = localStorage.getItem("token");
 
@@ -74,6 +99,7 @@ export async function getUserProfile(user_id: string) {
     const user: ServerUserProfile = result.data;
 
     const client_data: UserProfileData = {
+      id: user.id,
       owner: user.owner,
       name: user.name,
       bio: user.bio,
@@ -92,7 +118,14 @@ export async function getUserProfile(user_id: string) {
   throw new Error("Failed to fetch user");
 }
 
+export function getPngUrl(entity_id: number, entity_type: "user" | "post") {
+  const path = `${backendUrl}/png/see${entity_type[0]}${entity_id}.png`;
+  console.log(path);
+  return path;
+}
+
 interface ServerUserProfile {
+  id: number;
   owner: boolean;
   name: string;
   image: string;

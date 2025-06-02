@@ -3,6 +3,9 @@ import { PrismaClient } from '.prisma/client';
 
 @Injectable()
 export class PdfService {
+  findRecentPdfImages() {
+    throw new Error('Method not implemented.');
+  }
   prisma = new PrismaClient();
 
   findAllUserPngs(user_id: number) {
