@@ -5,6 +5,7 @@ export class FileStorage {
   static PNG_STORAGE_PATH = '/storage/pngs';
   static PDF_STORAGE_PATH = '/storage/pdfs';
   static DEFAULT_PROFILE_IMG_PATH = '/storage/default.png';
+  static DEFAULT_PDF_PATH = '/storage/default.pdf';
 
   static storeImage(image_name: string, buffer: Buffer<ArrayBufferLike>) {
     const file_type = image_name.split('.').at(-1);

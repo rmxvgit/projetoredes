@@ -19,6 +19,7 @@ import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ImageFields, NewPngBody } from './dtos';
 import { AuthTokenDto } from 'src/auth/dto/auth.dto';
+import { getUserTokenData } from 'src/lib/conversions';
 
 @Controller('png')
 export class PngController {
@@ -37,9 +38,7 @@ export class PngController {
 
   @Get('see:name')
   seeImage(@Param('name') name: string, @Res() res: Response) {
-    console.log(name);
-    console.log(process.cwd());
-    console.log(FileStorage.PNG_STORAGE_PATH);
+    console.log('retrieving png', name);
 
     let file_path = join(process.cwd(), FileStorage.PNG_STORAGE_PATH, name);
 
@@ -60,8 +59,8 @@ export class PngController {
     image: ImageFields,
     @Req() request: any,
   ) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-    const user: AuthTokenDto = request.user;
+    console.log('posting pdf...', image.originalname);
+    const user: AuthTokenDto = getUserTokenData(request);
     return this.pngService.createPng(body, image, user.id);
   }
 

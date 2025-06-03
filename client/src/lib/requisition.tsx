@@ -118,13 +118,21 @@ export async function getUserProfile(user_id: string) {
   throw new Error("Failed to fetch user");
 }
 
-export async function makePngPost(file: File, title: string) {
+export async function makeFilePost(
+  file: File,
+  title: string,
+  type: "pdf" | "png",
+) {
+  if (file.name.split(".").at(-1) != type) {
+    throw new Error("formato de arquivo inválido");
+  }
+
   const token = localStorage.getItem("token");
   const form_data = new FormData();
   form_data.append("title", title);
   form_data.append("image", file);
 
-  const response = await axios.post(`${backendUrl}/png`, form_data, {
+  const response = await axios.post(`${backendUrl}/${type}`, form_data, {
     headers: {
       "Content-Type": "multipart/form-data",
       Authorization: `Bearer ${token}`,
@@ -136,6 +144,12 @@ export async function makePngPost(file: File, title: string) {
 
 export function getPngUrl(entity_id: number, entity_type: "user" | "post") {
   const path = `${backendUrl}/png/see${entity_type[0]}${entity_id}.png`;
+  console.log(path);
+  return path;
+}
+
+export function getPdfUrl(entity_id: number) {
+  const path = `${backendUrl}/pdf/seep${entity_id}.pdf`;
   console.log(path);
   return path;
 }

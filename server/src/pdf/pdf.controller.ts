@@ -3,7 +3,12 @@ import {
   HttpException,
   HttpStatus,
   Res,
+  Post,
   UseGuards,
+  Body,
+  Req,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { Param, Get } from '@nestjs/common';
 import { PdfService } from './pdf.service';
@@ -12,6 +17,10 @@ import { FileStorage } from 'src/lib/storage';
 import { join } from 'path/posix';
 import { existsSync, createReadStream } from 'fs';
 import { Response } from 'express';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { AuthTokenDto } from 'src/auth/dto/auth.dto';
+import { NewPngBody, ImageFields } from 'src/png/dtos';
+import { getUserTokenData } from 'src/lib/conversions';
 
 @Controller('pdf')
 export class PdfController {
@@ -25,24 +34,35 @@ export class PdfController {
 
   @Get('see:name')
   findRecendUserPngImages(@Param('name') name: string, @Res() res: Response) {
-    console.log(name);
-    console.log(process.cwd());
-    console.log(FileStorage.PDF_STORAGE_PATH);
-
-    const file_path = join(process.cwd(), FileStorage.PNG_STORAGE_PATH, name);
+    console.log('retrieving pdf', name);
+    let file_path = join(process.cwd(), FileStorage.PNG_STORAGE_PATH, name);
 
     if (!existsSync(file_path)) {
-      throw new HttpException('File not found', HttpStatus.BAD_REQUEST);
+      file_path = join(process.cwd(), FileStorage.DEFAULT_PDF_PATH);
     }
 
     const stream = createReadStream(file_path);
     stream.pipe(res);
   }
 
+  @Post('')
+  @UseGuards(AuthGuard)
+  @UseInterceptors(FileInterceptor('image'))
+  newPngPost(
+    @Body() body: NewPngBody,
+    @UploadedFile()
+    image: ImageFields,
+    @Req() request: any,
+  ) {
+    console.log('posting pdf...', image.originalname);
+    const user: AuthTokenDto = getUserTokenData(request);
+    return this.pdfService.createPdf(body, image, user.id);
+  }
+
   @Get('recent')
   @UseGuards(AuthGuard)
   findRecentPdfs() {
-    return this.pdfService.findRecentPngs();
+    return this.pdfService.findRecenPdfs();
   }
 
   @Get(':id')

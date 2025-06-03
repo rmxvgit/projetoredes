@@ -2,13 +2,25 @@ import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { UpdateUserDto } from './dtos';
 import { FileStorage } from 'src/lib/storage';
+import { AuthTokenDto } from 'src/auth/dto/auth.dto';
+import { ImageInfo } from 'src/lib/dtos';
 
 @Injectable()
 export class UserService {
+  prisma = new PrismaClient();
+
+  async updateUserImage(credentials: AuthTokenDto, img: ImageInfo) {
+    await this.prisma.user.update({
+      where: { id: credentials.id },
+      data: { image: img.originalname },
+    });
+
+    FileStorage.storeImage(`u${credentials.id}`, img.buffer);
+  }
+
   createNoImage() {
     throw new Error('Method not implemented.');
   }
-  prisma = new PrismaClient();
 
   async findAll() {
     return this.prisma.user.findMany({

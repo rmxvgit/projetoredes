@@ -144,11 +144,9 @@ export default function UserProfilePage() {
       ) : null}
 
       {/* postagens */}
-      <div>
-        <h2 className="text-2xl p-3 font-bold">Postagens:</h2>
-        <div className="grid gap-3 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 grid-cols">
-          {user.posts.map(makePostCard)}
-        </div>
+      <h2 className="text-2xl p-3 font-bold">Postagens:</h2>
+      <div className="flex gap-3 w-full flex-wrap ">
+        {user.posts.map(makePostCard)}
       </div>
     </div>
   );

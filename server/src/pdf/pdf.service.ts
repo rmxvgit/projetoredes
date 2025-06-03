@@ -1,18 +1,35 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaClient } from '.prisma/client';
+import { NewPngBody, ImageFields } from 'src/png/dtos';
+import { FileStorage } from 'src/lib/storage';
 
 @Injectable()
 export class PdfService {
-  findRecentPdfImages() {
-    throw new Error('Method not implemented.');
-  }
   prisma = new PrismaClient();
+
+  async createPdf(body: NewPngBody, image: ImageFields, id: number) {
+    const result = await this.prisma.pdf.create({
+      data: {
+        title: body.title,
+        file_name: image.originalname,
+        user_id: id,
+      },
+    });
+
+    try {
+      FileStorage.storeImage(`p${result.id}.pdf`, image.buffer);
+    } catch {
+      return await this.prisma.pdf.delete({ where: { id: result.id } });
+    }
+
+    return result;
+  }
 
   findAllUserPngs(user_id: number) {
     return this.prisma.post.findMany({ where: { id: user_id } });
   }
 
-  findRecentPngs() {
+  findRecenPdfs() {
     return this.prisma.pdf.findMany({
       take: 20,
       select: {

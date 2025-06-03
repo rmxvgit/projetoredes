@@ -15,6 +15,8 @@ import { UpdateUserDto } from './dtos';
 import { AuthGuard } from 'src/auth/guards/guards';
 import { AuthTokenDto } from 'src/auth/dto/auth.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ImageInfo } from 'src/lib/dtos';
+import { getUserTokenData } from 'src/lib/conversions';
 
 @Controller('user')
 export class UserController {
@@ -46,7 +48,7 @@ export class UserController {
   create(
     @Req() request: any,
     @UploadedFile()
-    image: { originalname: string; buffer: Buffer; mimetype: string } | null,
+    image: ImageInfo | null,
     @Body() body: { name: string; job: string; password: string; bio: string },
   ) {
     if (!image) {
@@ -67,14 +69,14 @@ export class UserController {
     return this.userService.create(user_data);
   }
 
-  // 🚨 PEGAR IMAGEM DE PERFIL
-  @Get('profileimage')
-  @UseGuards(AuthGuard)
-  getUserImage(@Param('id') id: string) {}
-
   // 🚨 ALTERAR IMAGEM DO USUÁRIO
   @Patch('image:id')
-  updateUserImage(@Param('id') id: string) {}
+  @UseGuards(AuthGuard)
+  @UseInterceptors(FileInterceptor('image'))
+  updateUserImage(@Req() req: any, @UploadedFile() img: ImageInfo) {
+    const credentials = getUserTokenData(req);
+    return this.userService.updateUserImage(credentials, img);
+  }
 
   // 🚨 ALTERAR DADOS DO USUÁRIO
   @Patch(':id')

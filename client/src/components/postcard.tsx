@@ -1,7 +1,9 @@
 import { Post } from "@/lib/interfaces";
-import { getPngUrl } from "@/lib/requisition";
+import Link from "next/link";
+import { getPdfUrl, getPngUrl } from "@/lib/requisition";
 import Image from "next/image";
 import { JSX } from "react";
+import PdfViewer from "./pdf_viewer";
 
 export function makePostCard(data: Post) {
   let content: JSX.Element = <></>;
@@ -23,7 +25,14 @@ export function makePostCard(data: Post) {
   }
 
   if ("pdf" in data) {
-    content = <div>pdf content</div>;
+    content = (
+      <Link
+        href={getPdfUrl(data.id)}
+        className="flex justify-center overflow-hidden rounded-lg"
+      >
+        <PdfViewer url={getPdfUrl(data.id)} />
+      </Link>
+    );
     doc_type = "pdf";
   }
 
@@ -35,13 +44,13 @@ export function makePostCard(data: Post) {
   return (
     <div
       key={`${data.id}${doc_type}`}
-      className="bg-white rounded-lg shadow-md p-4 border"
+      className="bg-white rounded-lg shadow-md p-4 border w-78 h-106 overflow-hidden"
     >
       <div className="flex justify-between">
         <h4 className="font-bold text-sm">{data.author_name} postou:</h4>
         <p className="bg-blue-400 px-2 rounded-full">{doc_type}</p>
       </div>
-      <p className="p text-lg font-bold mb-3">{data.title}</p>
+      <p className="text-lg font-bold mb-3">{data.title}</p>
       {content}
     </div>
   );
