@@ -7,9 +7,9 @@ export interface CreateUserDto {
 }
 
 export interface UpdateUserDto {
-  name: string | undefined;
-  password: string | undefined;
-  bio: string | undefined;
-  image: string | undefined;
-  job: string | undefined;
+  name?: string;
+  password?: string;
+  bio?: string;
+  image?: string;
+  job?: string;
 }

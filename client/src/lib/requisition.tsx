@@ -34,6 +34,35 @@ export async function register(
   return response;
 }
 
+export async function editProfileRequisition(
+  data: {
+    name: string | undefined;
+    password: string | undefined;
+    bio: string | undefined;
+    job: string | undefined;
+  },
+  file: File | null,
+) {
+  const token = localStorage.getItem("token");
+
+  const fields_edition = await axios.patch(`${backendUrl}/user`, data, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (file) {
+    const form_data = new FormData();
+    form_data.append("image", file);
+
+    const image_edition = await axios.patch(
+      `${backendUrl}/user/image`,
+      form_data,
+      { headers: { Authorization: `Bearer ${token}` } },
+    );
+    return { fields_edition, image_edition };
+  }
+
+  return { fields_edition };
+}
+
 export async function getPosts() {
   const token = localStorage.getItem("token");
 

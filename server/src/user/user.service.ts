@@ -15,7 +15,7 @@ export class UserService {
       data: { image: img.originalname },
     });
 
-    FileStorage.storeImage(`u${credentials.id}`, img.buffer);
+    FileStorage.storeImage(`u${credentials.id}.png`, img.buffer);
   }
 
   createNoImage() {
@@ -77,7 +77,10 @@ export class UserService {
     }
   }
 
-  async update(id: number, data: UpdateUserDto) {
-    return this.prisma.user.update({ where: { id }, data: data });
+  async update(credentials: AuthTokenDto, data: UpdateUserDto) {
+    return this.prisma.user.update({
+      where: { id: credentials.id },
+      data: data,
+    });
   }
 }

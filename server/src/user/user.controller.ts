@@ -70,17 +70,21 @@ export class UserController {
   }
 
   // 🚨 ALTERAR IMAGEM DO USUÁRIO
-  @Patch('image:id')
+  @Patch('image')
   @UseGuards(AuthGuard)
   @UseInterceptors(FileInterceptor('image'))
   updateUserImage(@Req() req: any, @UploadedFile() img: ImageInfo) {
+    console.log(img);
     const credentials = getUserTokenData(req);
     return this.userService.updateUserImage(credentials, img);
   }
 
   // 🚨 ALTERAR DADOS DO USUÁRIO
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() data: UpdateUserDto) {
-    return this.userService.update(parseInt(id, 10), data);
+  @Patch()
+  @UseGuards(AuthGuard)
+  update(@Body() data: UpdateUserDto, @Req() req: any) {
+    console.log(data);
+    const credetials = getUserTokenData(req);
+    return this.userService.update(credetials, data);
   }
 }

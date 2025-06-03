@@ -8,6 +8,7 @@ import { makePostCard } from "@/components/postcard";
 import { UserProfileData } from "@/lib/interfaces";
 import Image from "next/image";
 import NewPostForm from "./forms";
+import Link from "next/link";
 
 export default function UserProfilePage() {
   const params = useParams<{ profile: string }>();
@@ -80,9 +81,12 @@ export default function UserProfilePage() {
             <p className="content-center text-2xl">{user.job}</p>
           </div>
           {user.owner ? (
-            <button className="bg-blue-400 rounded-xl p-2 text-2xl font-bold w-fit hover:bg-blue-500">
+            <Link
+              href="/edit_profile"
+              className="bg-blue-400 rounded-xl p-2 text-2xl font-bold w-fit hover:bg-blue-500"
+            >
               Editar perfil
-            </button>
+            </Link>
           ) : null}
         </div>
       </div>
