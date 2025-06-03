@@ -145,7 +145,7 @@ export default function UserProfilePage() {
 
       {/* postagens */}
       <h2 className="text-2xl p-3 font-bold">Postagens:</h2>
-      <div className="flex gap-3 w-full flex-wrap ">
+      <div className="flex gap-3 flex-wrap ">
         {user.posts.map(makePostCard)}
       </div>
     </div>
